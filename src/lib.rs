@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::CanvasRenderingContext2d;
 use std::collections::VecDeque;
-use std::ops::Add;
+use std::ops::{Add, RangeBounds};
 use rand::thread_rng;
 use rand::seq::SliceRandom;
 mod test;
@@ -212,7 +212,23 @@ impl Game {
         let mut food_collision: bool = false;
         if self.food.same_pos(&self.snake.head) {
             food_collision = true;
-            let (new_food_row, new_food_col) = self.random_unoccupied_point();
+
+            let mut occupied_points = Vec::new();
+            occupied_points.push((
+                self.snake.head.row,
+                self.snake.head.col
+            ));
+            occupied_points.push((
+                old_head_as_tail.row,
+                old_head_as_tail.col
+            ));
+            for item in &self.snake.tail{
+                occupied_points.push(
+                    (item.row, item.col)
+                )
+            }
+
+            let (new_food_row, new_food_col) = self.random_unoccupied_point(&occupied_points);
             self.food.row = new_food_row;
             self.food.col = new_food_col;
         }
@@ -243,28 +259,16 @@ impl Game {
         self.board.draw_piece(ctx, &self.food);
     }
 
-    fn random_unoccupied_point(&self) -> (u32, u32) {
-        let mut occupied_points = Vec::new();
-        occupied_points.push((
-            self.snake.head.row,
-            self.snake.head.col
-        ));
-        for item in &self.snake.tail{
-            occupied_points.push(
-                (item.row, item.col)
-            )
-        }
+    fn random_unoccupied_point(&self, occupied_points: &Vec<(u32, u32)>) -> (u32, u32) {
 
-        let mut all_points = Vec::new();
+        let mut unoccupied_points = Vec::new();
         for i in 0..self.board.block_height {
             for j in 0..self.board.block_width {
-                all_points.push((i, j));
+                if !occupied_points.contains(&(i, j)) {
+                    unoccupied_points.push((i, j));
+                }
             }
         }
-        let unoccupied_points: Vec<(u32, u32)> = all_points.iter()
-            .filter(|x: &&(u32, u32)| !occupied_points.contains(x))
-            .cloned()
-            .collect();
 
         let mut rng = thread_rng();
         match unoccupied_points.choose(&mut rng) {
