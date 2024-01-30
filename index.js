@@ -21,7 +21,8 @@ function step(timeStamp) {
     start = timeStamp;
     game.step(ctx, key);
     if (game.get_gameover()) {
-      alert("You died. Play again?");
+      // commented out to make infinite game loop
+      // alert("You died. Play again?");
       game = rustModule.Game.new(ctx, 20, 20, 20);
 
     }

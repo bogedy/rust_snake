@@ -26,7 +26,8 @@ impl Board {
     } 
 
     pub fn clear_board(&self, ctx: &CanvasRenderingContext2d){
-        ctx.clear_rect(0.0, 0.0, 
+        ctx.set_fill_style(&JsValue::from_str("white"));
+        ctx.fill_rect(0.0, 0.0, 
             (self.block_width * self.block_pixel_size) as f64,
             (self.block_height * self.block_pixel_size) as f64)
     }
