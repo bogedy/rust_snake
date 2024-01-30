@@ -238,15 +238,15 @@ impl Game {
             self.gameover = true;
         }
         
-        // check tail collisions
-        if self.snake.tail.iter().any(|piece| piece.same_pos(&self.snake.head)) {
-            self.gameover=true;
-        }
-        
         // update tail
         self.snake.tail.push_back(old_head_as_tail);
         if !food_collision {
             self.snake.tail.pop_front();
+        }
+        
+        // check tail collisions
+        if self.snake.tail.iter().any(|piece| piece.same_pos(&self.snake.head)) {
+            self.gameover=true;
         }
     }
 
